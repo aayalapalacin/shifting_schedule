@@ -114,6 +114,7 @@ function Input() {
                     onClick={() => {
                       setRefresh(false);
                       if(programTitle.name == "Create New Program"){
+                        
                         setNewProgram(true);
                         setUpdatedPrograms((prevUpdatedPrograms) => {
                           const updatedProgramsList = [...prevUpdatedPrograms,
@@ -137,7 +138,6 @@ function Input() {
                               wednesday_start: null
                           }
                           ];
-                          
                           setProgramIndex(
                             updatedProgramsList[index ].program_number - 1
                           );
@@ -219,12 +219,11 @@ function Input() {
         {!newProgram ? <>
                 <button
                 onClick={()=>{
-                  actions.deleteProgram(updatedPrograms[programIndex].program_number);
+                  actions.deleteProgram(updatedPrograms[programIndex].id);
                   let newProgramList = updatedPrograms.filter((item)=> item.program_number != updatedPrograms[programIndex].program_number)
                   newProgramList.forEach((item,i)=>{
                     item.program_number = i + 1
                   })
-                  console.log(newProgramList,"filter")
           
                   setProgramIndex(0);
                   setDropdownTitle(updatedPrograms[0])
@@ -309,7 +308,7 @@ function Input() {
           <div className=" input-mobile-start-end d-flex justify-content-start ">
             {dayArray.map((day, i) => {
               // list variables for conditions
-
+             
               let dayStartTrue =  updatedPrograms[programIndex]?.[
                 `${day.toLowerCase()}_start`
               ] &&
@@ -361,7 +360,7 @@ function Input() {
                             dayStartFalse
                           ) {
                             setUpdatedPrograms((prevUpdatedPrograms) => {
-                              const updatedProgramsList = [
+                              let updatedProgramsList = [
                                 ...prevUpdatedPrograms,
                               ]; 
                               updatedProgramsList[programIndex] = {
@@ -1021,8 +1020,7 @@ function Input() {
                   boxShadow: "rgb(5 218 210) 0px 1px 4.5px 0px",
                 }}
                 onClick={(e) => {
-               console.log(programName,"name")
-               console.log(programDescription,"descr")
+            
                   if(programName.length == 0 && programDescription.length == 0){
                     setErrorMessage("Program name and description cannot be left blank")
                   }
@@ -1049,7 +1047,6 @@ function Input() {
                     e.preventDefault();
                     setProgramIndex(0);
                     setRefresh(true);
-                    console.log(updatedPrograms,"submit")
                     actions.updateProgram(updatedPrograms);
                   }
                 }}
