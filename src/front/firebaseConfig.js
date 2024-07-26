@@ -1,15 +1,13 @@
-// firebaseConfig.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyAqvD7zHqled4-CF2a2YHjwrYTc6jseEPg",
-  authDomain: "schedule-shifter-api.firebaseapp.com",
-  projectId: "schedule-shifter-api",
-  storageBucket: "schedule-shifter-api.appspot.com",
-  messagingSenderId: "575695827757",
-  appId: "1:575695827757:web:dfbcc1e0b539a1721e19a4"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
