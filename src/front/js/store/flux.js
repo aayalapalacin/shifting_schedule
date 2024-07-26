@@ -1,3 +1,6 @@
+import { db } from "../../firebaseConfig";
+import { collection, getDocs, doc, updateDoc, addDoc,deleteDoc } from "firebase/firestore";
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 	  store: {
@@ -7,69 +10,74 @@ const getState = ({ getStore, getActions, setStore }) => {
 	  },
 	  actions: {
 		getProgram: async () => {
-		  console.log("process.env.BACKEND_URL ", process.env.BACKEND_URL);
-		  try {
-			const resp = await fetch(process.env.BACKEND_URL + "/api/programs");
-			const data = await resp.json();
-			let sortedData = data.sort(
-			  (a, b) => a.program_number - b.program_number
-			);
-			setStore({ programs: sortedData });
-  
-			return data;
-		  } catch (error) {
-			console.log("Error loading message from backend", error);
-		  }
-		},
-		updateProgram: async (programData) => {
+			try {
+			  const querySnapshot = await getDocs(collection(db, "Programs"));
+			  const data = querySnapshot.docs.map(doc => ({
+				id: doc.id,
+				...doc.data(),
+			  }));
+			  let sortedData = data.sort(
+				(a, b) => a.program_number - b.program_number
+			  );
+			  setStore({ programs: sortedData });
+			  return data;
+			} catch (error) {
+			  console.log("Error loading programs from Firestore", error);
+			}
+		  },
+		  updateProgram: async (programData) => {
+			programData.forEach( async (program)=>{
+				try {
+					const programRef = doc(db, "Programs", program.id);
+					await updateDoc(programRef, program);
+	  
+					setStore({ inputStatusMessage: "Programs successfully updated!" });
+		  
+					// Fetch updated programs to refresh the state
+					const updatedPrograms = await getDocs(collection(db, "Programs"));
+					const data = updatedPrograms.docs.map((doc) => ({
+					  id: doc.id,
+					  ...doc.data(),
+					}));
+					let sortedData = data.sort(
+					  (a, b) => a.program_number - b.program_number
+					);
+					console.log(sortedData,"sortedData")
+					setStore({ programs: sortedData });
+		  
+					return data;
+				  } catch (error) {
+					setStore({
+					  inputStatusMessage: "Programs not updated, please try again",
+					});
+					console.log("Error updating program in Firestore", error);
+				  }
+			})
 			
-		  try {
-			const resp = await fetch(
-			  process.env.BACKEND_URL + "/api/updateProgram",
-			  {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(programData),
-			  }
-			);
-			const data = await resp.json();
-			if (resp.status == 200) {
-			  setStore({ inputStatusMessage: "Programs successfully updated!" });
-			} 
-			
-			setStore({ programs: data });
-			
-			return data;
-		} catch (error) {
-			setStore({ inputStatusMessage: "Programs not updated, please try again" });
-			console.log("Error loading message from backend", error);
-		  }
-		},
-		createProgram: async (programData) => {
-			
-		  try {
-			const resp = await fetch(
-			  process.env.BACKEND_URL + "/api/newProgram",
-			  {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(programData),
-			  }
-			);
-			const data = await resp.json();
-			if (resp.status == 200) {
+		  },
+		  createProgram: async (programData) => {
+			try {
+			  // Add a new document in collection "Programs"
+			  await addDoc(collection(db, "Programs"), programData);
 			  setStore({ inputStatusMessage: "Program successfully created!" });
-			} 
-			
-			
-			setTimeout(window.location.reload(false),9000);
-			return data;
-
-		} catch (error) {
-			setStore({ inputStatusMessage: "Program not created, please try again" });
-			console.log("Error loading message from backend", error);
-		  }
-		},
+		
+			  // Fetch updated programs to refresh the state
+			  const updatedPrograms = await getDocs(collection(db, "Programs"));
+			  const data = updatedPrograms.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data(),
+			  }));
+			  let sortedData = data.sort(
+				(a, b) => a.program_number - b.program_number
+			  );
+			  setStore({ programs: sortedData });
+		
+			  return data;
+			} catch (error) {
+			  setStore({ inputStatusMessage: "Program not created, please try again" });
+			  console.error("Error creating program in Firestore", error);
+			}
+		  },
 		clearInputStatusMessage: () => {
 		  setStore({ inputStatusMessage: "" });
 		},
@@ -113,28 +121,33 @@ const getState = ({ getStore, getActions, setStore }) => {
   
 		  setStore({ totalHours: totalHoursArray });
 		},
-		deleteProgram: async (program_number)=>{
-			try{
-				const resp = await fetch(
-					process.env.BACKEND_URL + `/api/deleteProgram/${program_number}`,
-					{
-					  method: "DELETE",
-					  headers: { "Content-Type": "application/json" },
-					}
-				  );
-				 
+		deleteProgram: async (programId) => {
+			try {
+			  const programRef = doc(db, "Programs", programId);
+			  await deleteDoc(programRef);
 		
-				  if (resp.status == 200) {
-					setStore({ inputStatusMessage: "Program successfully deleted!" });
-					setTimeout(window.location.reload(false),12000);
-				  } 
+			  setStore({ inputStatusMessage: "Program successfully deleted!" });
+		
+			  // Fetch updated programs to refresh the state
+			  const updatedPrograms = await getDocs(collection(db, "Programs"));
+			  const data = updatedPrograms.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data(),
+			  }));
+			  let sortedData = data.sort(
+				(a, b) => a.program_number - b.program_number
+			  );
+			  setStore({ programs: sortedData });
+		
+			 
+			} catch (error) {
+			  setStore({ inputStatusMessage: "Program not deleted, please try again" });
+			  console.log("Error deleting program in Firestore", error);
+		
+			  // Clear the inputStatusMessage after a delay even on error
+			 
 			}
-			catch (error) {
-				setStore({ inputStatusMessage: "Program not deleted, please try again" });
-				console.log("Error loading message from backend", error);
-			  }
-
-		},
+		  },
 	  },
 	};
   };
