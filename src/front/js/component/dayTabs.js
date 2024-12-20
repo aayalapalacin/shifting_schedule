@@ -50,48 +50,41 @@ function DayTabs() {
         })}
       </ul>
       {/* mobile viewing */}
-      {dayArray.map((day, i) => {
-        return (
-          <>
-            <div className="btn-group d-flex justify-content-start ms-4 mb-1 d-md-none">
-              <button
-                type="button"
-                className={`nav-link dropdown-toggle ${
-                  currentDay == day ? "active " : "d-none d-md-block"
-                } dayFont border  `}
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                style={{ fontSize: "5.5vw" }}
-              >
-                {capitalLetterDays}
-              </button>
-              <ul className="dropdown-menu bg-transparent">
-                {dayArray.map((dropdownDay, i) => {
-                  let capitalLetterDropwdownDay =
-                    dropdownDay[0].toUpperCase() +
-                    dropdownDay.replace(dropdownDay[0], "");
-                  return (
-                    <div key={i}>
-                      <li
-                        onClick={() => setDays(dropdownDay)}
-                        style={{ fontSize: "5.5vw" }}
-                      >
-                        <a
-                          className={`dropdown-item ${
-                            dropdownDay != days ? "d-block" : "d-none"
-                          } bg-light border p-2`}
-                        >
-                          {capitalLetterDropwdownDay}
-                        </a>
-                      </li>
-                    </div>
-                  );
-                })}
-              </ul>
-            </div>
-          </>
-        );
-      })}
+
+      <div className="btn-group d-flex justify-content-start ms-4 mb-1 d-md-none">
+        <button
+          type="button"
+          className={`nav-link dropdown-toggle dayFont border  active`}
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          style={{ fontSize: "5.5vw" }}
+        >
+          {capitalLetterDays}
+        </button>
+        <ul className="dropdown-menu bg-transparent">
+          {dayArray.map((dropdownDay, i) => {
+            let capitalLetterDropwdownDay =
+              dropdownDay[0].toUpperCase() +
+              dropdownDay.replace(dropdownDay[0], "");
+            return (
+              <div key={i}>
+                <li
+                  onClick={() => setDays(dropdownDay)}
+                  style={{ fontSize: "5.5vw" }}
+                >
+                  <a
+                    className={`dropdown-item ${
+                      dropdownDay != days ? "d-block" : "d-none"
+                    } bg-light border p-2`}
+                  >
+                    {capitalLetterDropwdownDay}
+                  </a>
+                </li>
+              </div>
+            );
+          })}
+        </ul>
+      </div>
 
       {store.programs.length > 0 ? <Calendar days={days} /> : <NoPrograms />}
     </div>
