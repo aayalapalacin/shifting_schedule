@@ -30,10 +30,8 @@ function DayTabs() {
               <li className="nav-item" role="presentation">
                 <button
                   className={`nav-link ${
-                    currentDay == day
-                      ? "active d-none d-md-block "
-                      : "d-none d-md-block"
-                  } dayFont border  `}
+                    currentDay == day ? "active  " : ""
+                  } d-none d-md-block dayFont border  `}
                   data-bs-toggle="pill"
                   data-bs-target={`#pills-${day}`}
                   type="button"
@@ -51,7 +49,7 @@ function DayTabs() {
       </ul>
       {/* mobile viewing */}
 
-      <div className="btn-group d-flex justify-content-start ms-4 mb-1 d-md-none">
+      <div className="btn-group d-flex justify-content-start mt-5 ms-4 mb-1 d-md-none">
         <button
           type="button"
           className={`nav-link dropdown-toggle dayFont border  active`}

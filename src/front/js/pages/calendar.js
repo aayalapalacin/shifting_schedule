@@ -1,9 +1,8 @@
-import React, { useContext, useState,useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/calendar.css";
-import ModalComponent from "../component/modal";
-import 'react-responsive-modal/styles.css';
-import { Modal } from 'react-responsive-modal';
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
 
 let hourArray = [
   "9:00 AM",
@@ -23,117 +22,115 @@ let hourArray = [
 let bgColor = "rgb(72 177 186 / 63%)";
 
 function Calendar(props) {
+  const { store, actions } = useContext(Context);
+
   const [open, setOpen] = useState(false);
-  const [animate, setAnimate] = useState(false);
   const onOpenModal = () => setOpen(true);
   const onCloseModal = () => setOpen(false);
-  const { store, actions } = useContext(Context);
   const [modalData, setModalData] = useState({});
+
+  const [animate, setAnimate] = useState(false);
   let trHeight = Math.floor(100 / store.programs.length);
 
-  
-let noProgramCount = 0
-  const noProgramsToday = ()=>{
-    store.programs.forEach((program,index)=>{   
-      if(program[`${props.days}_start`] != null ){
-        noProgramCount++
+  let noProgramCount = 0;
+  const noProgramsToday = () => {
+    store.programs.forEach((program, index) => {
+      if (program[`${props.days}_start`] != null) {
+        noProgramCount++;
       }
-      
-    })
-    
-   
-  }
-  noProgramsToday()
+    });
+  };
+  noProgramsToday();
 
-  
   useEffect(() => {
     setAnimate(true);
-
     const timeoutId = setTimeout(() => setAnimate(false), 1500);
 
     return () => clearTimeout(timeoutId);
   }, [props.days]);
+
   return (
     <div>
- 
-      <Modal 
-      open={open} 
-      onClose={onCloseModal} 
-      center
-      classNames={{
-        modal: 'customModal',
-      }}
+      <Modal
+        open={open}
+        onClose={onCloseModal}
+        center
+        classNames={{
+          modal: "customModal",
+        }}
       >
-      <div className="content">
-            <span className="header">
-              <h5 className="title fw-bold  border-bottom" >
-                {modalData.name}
-              </h5>
-             
-            </span>
-            <div className="body">{modalData.description}</div>
-            <div className="footer">
-              
-            </div>
-          </div>
+        <div className="content">
+          <span className="header">
+            <h5 className="title fw-bold  border-bottom">{modalData.name}</h5>
+          </span>
+          <div className="body">{modalData.description}</div>
+          <div className="footer"></div>
+        </div>
       </Modal>
       {/* mobile start */}
-  
-      <div 
-      className="d-block d-md-none d-lg-none  m-auto px-3 py-1 rounded text-start"
-      style={{ 
-        // backgroundColor: " rgb(72 177 186 / 40%)",
-        width:"86%"
-    }}
+
+      <div
+        className="d-block d-md-none d-lg-none  m-auto px-3 py-1 rounded text-start"
+        style={{
+          // backgroundColor: " rgb(72 177 186 / 40%)",
+          width: "86%",
+        }}
       >
-        {store.programs.map((program,i)=>{
-          return(
-            <div 
-            className={`${program[`${props.days}_start`] != null ? "d-block  " : "d-none"} ${animate ? "animation-fade" : ""}  d-md-none d-lg-none mb-3 p-2 ` }
-            key={program.id}
-            style={{backgroundColor: "rgb(72 177 186)"}}
-            onClick={() => {
-              onOpenModal()
-              setModalData(program)}}
+        {store.programs.map((program, i) => {
+          const programStartTime = program[`${props.days}_start`];
+          const programEndTime = program[`${props.days}_end`];
+          return (
+            <div
+              className={`${
+                programStartTime != null ? "d-block  " : "d-none"
+              } ${
+                animate ? "animation-fade" : ""
+              }  d-md-none d-lg-none mb-3 p-2 `}
+              key={program.id}
+              style={{ backgroundColor: "rgb(72 177 186)" }}
+              onClick={() => {
+                onOpenModal();
+                setModalData(program);
+              }}
             >
-                {program[`${props.days}_start`] && program[`${props.days}_start`] != null ? 
+              {programStartTime && programStartTime != null ? (
                 <>
-                  <span 
-                  className="fw-bold text-white p-1 rounded bg-orange "
-                  style={{ fontSize:" 5vw"
-                }}
+                  <span
+                    className="fw-bold text-white p-1 rounded bg-orange "
+                    style={{ fontSize: " 5vw" }}
                   >
-                      {program.name}
+                    {program.name}
                   </span>
                   <div className=" mt-2 align-items-center justify-content-between ">
-                  <p 
-                  className="mb-0   mobileInfoText"  
-                  >
-                  {program[`${props.days}_start`]
-                    ? program[`${props.days}_start`] +
-                      "-" +
-                      program[`${props.days}_end`]
-                    : " "}
-                </p>
-                <div
-                className=" text-decoration-underline text-end"
-                style={{fontSize:"4vw"}}
-                >*Click for more info</div>
-
+                    <p className="mb-0   mobileInfoText">
+                      {programStartTime
+                        ? programStartTime + "-" + programEndTime
+                        : " "}
+                    </p>
+                    <div
+                      className=" text-decoration-underline text-end"
+                      style={{ fontSize: "4vw" }}
+                    >
+                      *Click for more info
+                    </div>
                   </div>
-                
                 </>
-                
-                :
+              ) : (
                 ""
-              }
-
+              )}
             </div>
           );
         })}
       </div>
-      <div className={` w-75 m-auto mt-2 ${noProgramCount==0 ? "d-block d-md-none d-lg-none" : "d-none"}`}> <h1>No Programs Scheduled for Today</h1> </div>
-          {/* mobile end */}
+      <div
+        className={` w-75 m-auto mt-2 ${
+          noProgramCount == 0 ? "d-block d-md-none d-lg-none" : "d-none"
+        }`}
+      >
+        {" "}
+        <h1>No Programs Scheduled for Today</h1>{" "}
+      </div>
+      {/* mobile end */}
       <table className="table d-none d-md-table d-lg-table table-bordered ">
         <thead>
           <tr>
@@ -161,7 +158,7 @@ let noProgramCount = 0
         </thead>
         <tbody style={{ height: "58vh" }}>
           {store.programs.map((program, index) => {
-          let noProgramScheduled = !program[`${props.days}_start`]
+            let noProgramScheduled = !program[`${props.days}_start`];
             return (
               <tr
                 style={{
@@ -255,8 +252,9 @@ let noProgramCount = 0
                             left ? "titleLeft" : "titleRight"
                           } `}
                           onClick={() => {
-                            onOpenModal()
-                            setModalData(store.programs[index])}}
+                            onOpenModal();
+                            setModalData(store.programs[index]);
+                          }}
                           style={{
                             height: "1px",
                             overflow: "visible",
@@ -272,7 +270,6 @@ let noProgramCount = 0
                           ></div>
                           <div
                             className="scroller p-2 z-2 modalTD "
-                          
                             style={{
                               backgroundColor: bgColor,
                               fontSize: "87%",
@@ -280,7 +277,6 @@ let noProgramCount = 0
                               overflowY: "hidden",
                             }}
                           >
-                            
                             <div className="row ">
                               <p className="mb-0  ">
                                 {program[`${props.days}_start`]
@@ -308,8 +304,9 @@ let noProgramCount = 0
                           key={program.id}
                           colSpan={parseInt(programTotalHours) + 1}
                           onClick={() => {
-                            onOpenModal()
-                            setModalData(store.programs[index])}}
+                            onOpenModal();
+                            setModalData(store.programs[index]);
+                          }}
                           data-program-name={store.programs[index].name}
                           className={`p-0 ${
                             left ? "titleLeft" : "titleRight"
@@ -329,7 +326,6 @@ let noProgramCount = 0
                           ></div>
                           <div
                             className="scroller p-2 z-2 modalTD "
-                            
                             style={{
                               backgroundColor: bgColor,
                               fontSize: "87%",
@@ -365,8 +361,9 @@ let noProgramCount = 0
                           key={program.id}
                           colSpan={parseInt(programTotalHours) + 1}
                           onClick={() => {
-                            onOpenModal()
-                            setModalData(store.programs[index])}}
+                            onOpenModal();
+                            setModalData(store.programs[index]);
+                          }}
                           data-program-name={store.programs[index].name}
                           className={`p-0 ${
                             left ? "titleLeft" : "titleRight"
@@ -421,8 +418,9 @@ let noProgramCount = 0
                           key={program.id}
                           colSpan={parseInt(programTotalHours) + 1}
                           onClick={() => {
-                            onOpenModal()
-                            setModalData(store.programs[index])}}
+                            onOpenModal();
+                            setModalData(store.programs[index]);
+                          }}
                           data-program-name={store.programs[index].name}
                           //  solution to bug where startTime was 10:30 or 11:30
                           // the program would duplicate, but data would not duplicate
